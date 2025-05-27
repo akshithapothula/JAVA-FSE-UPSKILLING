@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Community Event Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6; /* Improves readability of text */
+        }
+
+        /* Navigation Spacing */
+        nav {
+            margin-bottom: 30px; /* Space below navigation */
+        }
+        nav a {
+            margin: 0 15px; /* More space between nav links */
+            text-decoration: none;
+            color: darkblue;
+            padding: 5px 0; /* Add some padding for better click area */
+        }
+
+        /* Section Spacing */
+        section {
+            margin-bottom: 40px; /* Space between major sections */
+            padding: 20px; /* Internal padding for sections */
+            border: 1px solid #eee; /* Light border for visual separation */
+            border-radius: 8px; /* Slightly rounded corners */
+            background-color: #fff; /* White background for sections */
+        }
+
+        /* Welcome Banner Specific Spacing */
+        #welcomeBanner {
+            background-color: lightblue;
+            padding: 20px; /* More padding inside the banner */
+            margin-bottom: 30px; /* Space below banner */
+            border-radius: 8px;
+        }
+        #welcomeBanner h1 {
+            margin-bottom: 10px; /* Space below heading */
+        }
+        #welcomeBanner p {
+            margin-bottom: 5px; /* Space between paragraphs in banner */
+        }
+
+        /* Highlight class for specific text */
+        .highlight {
+            background-color: yellow;
+            padding: 2px 5px; /* Small padding for highlight */
+        }
+
+        /* Image Gallery Spacing */
+        .gallery {
+            width: 100%;
+            border-collapse: separate; /* Allows for spacing between cells */
+            border-spacing: 15px; /* Space between table cells (images) */
+            margin-top: 20px;
+        }
+        .gallery caption {
+            margin-bottom: 15px; /* Space below caption */
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .gallery img {
+            border: 2px solid #ccc;
+            width: 150px;
+            height: 100px;
+            display: block; /* Ensures images behave like blocks for margin */
+            margin: auto; /* Center images in their cells */
+            transition: transform 0.2s ease-in-out; /* Smooth transition for enlarge */
+        }
+        .gallery img:hover {
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        /* Form Element Spacing */
+        form {
+            margin-top: 20px;
+        }
+        form input,
+        select,
+        textarea {
+            display: block;
+            width: calc(100% - 22px); /* Full width minus padding and border */
+            margin-bottom: 15px; /* Space below each form element */
+            padding: 10px; /* More padding for input fields */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        form button {
+            padding: 10px 20px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px; /* Space above button */
+        }
+        form button:hover {
+            background-color: #003366; /* Darker blue on hover */
+        }
+        #fee, #charCount {
+            margin-bottom: 15px; /* Space below fee and char count info */
+            font-weight: bold;
+        }
+        #confirmation {
+            margin-left: 10px; /* Space to the left of confirmation message */
+            color: green;
+            font-weight: bold;
+        }
+
+        /* Video Section Spacing */
+        video {
+            width: 100%; /* Make video responsive */
+            max-width: 500px; /* Limit max width */
+            margin-top: 20px;
+            display: block; /* To center the video */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #videoStatus {
+            margin-top: 10px; /* Space above video status */
+            font-style: italic;
+        }
+
+        /* Geolocation and Clear Preferences Buttons */
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px; /* Space between buttons */
+            margin-top: 10px; /* Space above buttons */
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #location {
+            margin-top: 15px; /* Space below location text */
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Footer Spacing */
+        footer {
+            margin-top: 40px; /* Space above footer */
+            text-align: center;
+            padding: 15px;
+            background-color: #f2f2f2;
+            border-top: 1px solid #e7e7e7;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            // Load stored event type
+            const savedType = localStorage.getItem('eventType');
+            if (savedType) document.getElementById('eventType').value = savedType;
+            // Initialize fee display if an event type is already selected
+            const eventTypeSelect = document.getElementById('eventType');
+            if (eventTypeSelect.value) {
+                showFee(eventTypeSelect);
+            }
+        };
+
+        function validatePhone(el) {
+            // Updated regex for 10 digits strictly. Adjust if other formats are allowed.
+            if (!/^\d{10}$/.test(el.value) && el.value !== "") {
+                alert("Please enter a 10-digit phone number (e.g., 1234567890).");
+                el.focus(); // Keep focus on the field
+            }
+        }
+
+        function showFee(el) {
+            const fee = { Music: "$10", Art: "$15", Tech: "$20" };
+            // Corrected template literal syntax for fee display
+            document.getElementById('fee').textContent = Fee: ${fee[el.value] || 'N/A'};
+            localStorage.setItem('eventType', el.value);
+        }
+
+        function confirmSubmit() {
+            // Gather form data for detailed confirmation as per exercise
+            const name = document.querySelector('input[name="name"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            const phone = document.querySelector('input[name="phone"]').value;
+            const date = document.querySelector('input[name="date"]').value;
+            const eventType = document.getElementById('eventType').value;
+            const message = document.querySelector('textarea[name="message"]').value;
+
+            const confirmationOutput = document.getElementById('confirmation');
+            confirmationOutput.innerHTML = `
+                <p><strong>Registration Confirmed!</strong></p>
+                <p>Thank you, ${name}, for registering.</p>
+                <p>A confirmation has been sent to: ${email}</p>
+                <p>Event Date: ${date}</p>
+                <p>Event Type: ${eventType}</p>
+                <p>Your Message: ${message}</p>
+            `;
+            return false; // Prevent actual form submission for demo
+        }
+
+        function enlargeImage(el) {
+            // Simple toggle for enlarge/shrink
+            if (el.style.width === "300px") {
+                el.style.width = "150px"; // Original width
+                el.style.height = "100px"; // Original height
+                el.style.zIndex = "1";
+                el.style.position = "static"; // Reset position
+            } else {
+                el.style.width = "300px";
+                el.style.height = "auto"; // Maintain aspect ratio
+                el.style.zIndex = "10"; // Bring enlarged image to front
+                el.style.position = "relative"; // Allow z-index to work
+            }
+        }
+
+        function countChars(el) {
+            document.getElementById('charCount').textContent = Characters: ${el.value.length};
+        }
+
+        function findLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        document.getElementById('location').textContent =
+                            Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)};
+                    },
+                    err => alert("Geolocation failed: " + err.message),
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                alert("Geolocation not supported by this browser.");
+            }
+        }
+
+        function clearPrefs() {
+            localStorage.clear();
+            sessionStorage.clear();
+            // Also clear the dropdown selection
+            document.getElementById('eventType').value = "";
+            document.getElementById('fee').textContent = "Fee: N/A"; // Reset fee display
+            alert("Preferences cleared.");
+        }
+
+        window.onbeforeunload = function() {
+            // Example: check if form fields are filled to warn user
+            const nameField = document.querySelector('input[name="name"]');
+            const emailField = document.querySelector('input[name="email"]');
+            if (nameField && emailField && (nameField.value !== '' || emailField.value !== '')) {
+                return "You have unsaved changes in the form. Are you sure you want to leave?";
+            }
+            // If no return value, no warning is shown
+        };
+
+
+        function showVideoReady() {
+            document.getElementById('videoStatus').textContent = "Video ready to play.";
+        }
+    </script>
+</head>
+<body>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#events">Events</a>
+        <a href="#contact">Contact</a>
+        <a href="help.html" target="_blank">Help</a>
+    </nav>
+
+    <main>
+        <section id="home">
+            <div id="welcomeBanner">
+                <h1>Welcome to the Community Portal</h1>
+                <p class="highlight">Enjoy our upcoming local events!</p>
+                <p><span style="color:red; font-weight:bold;">Special Offer: 50% Off!</span></p>
+            </div>
+        </section>
+
+        <section id="events">
+            <h2>Past Event Highlights</h2>
+            <table class="gallery">
+                <caption>Community Events Gallery</caption>
+                <tr>
+                    <td><img src="https://via.placeholder.com/150/FF5733/FFFFFF?text=Music+Fest" alt="Music Fest" title="Music Fest" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/33FF57/FFFFFF?text=Art+Fair" alt="Art Fair" title="Art Fair" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/5733FF/FFFFFF?text=Tech+Expo" alt="Tech Expo" title="Tech Expo" ondblclick="enlargeImage(this)"/></td>
+                </tr>
+                <tr>
+                    <td><img src="https://via.placeholder.com/150/FFC300/FFFFFF?text=Food+Carnival" alt="Food Carnival" title="Food Carnival" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/33C3FF/FFFFFF?text=Comm+Parade" alt="Community Parade" title="Community Parade" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/C3FF33/FFFFFF?text=Book+Fest" alt="Book Fest" title="Book Fest" ondblclick="enlargeImage(this)"/></td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="contact">
+            <h2>Register for an Event</h2>
+            <form onsubmit="return confirmSubmit();">
+                <input type="text" name="name" placeholder="Your Name" required autofocus>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Phone (10 digits)" onblur="validatePhone(this)">
+                <input type="date" name="date" required>
+                <select id="eventType" name="eventType" onchange="showFee(this)">
+                    <option value="">--Select Event--</option>
+                    <option value="Music">Music</option>
+                    <option value="Art">Art</option>
+                    <option value="Tech">Tech</option>
+                </select>
+                <p id="fee">Fee: N/A</p>
+                <textarea name="message" placeholder="Your message..." onkeyup="countChars(this)"></textarea>
+                <p id="charCount">Characters: 0</p>
+                <button type="submit">Submit</button>
+                <output id="confirmation"></output>
+            </form>
+        </section>
+
+        <section>
+            <h2>Watch Our Promo</h2>
+            <video controls oncanplay="showVideoReady()">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <p id="videoStatus"></p>
+        </section>
+
+        <section>
+            <h2>Find Nearby Events</h2>
+            <button onclick="findLocation()">Find Nearby Events</button>
+            <p id="location"></p>
+        </section>
+
+        <section>
+            <button onclick="clearPrefs()">Clear Preferences</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 City Community Portal</p>
+    </footer>
+
+</body>
+</html>
+
+/* Header styles */ 
+#mainHeader { /* ID selector for the banner [cite: 11] */
+    background-color: #f0f0f0; 
+    color: #333; 
+    padding: 20px; 
+    text-align: center; 
+}
+
+/* Universal selector to reset margin/padding [cite: 11] */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+/* Style for all h2 elements [cite: 11] */
+h2 { 
+    color: #0056b3; 
+    margin-bottom: 15px; 
+    text-align: center;
+    background: linear-gradient(to right, #e0e0e0, #ffffff); /* Apply gradients to section headers [cite: 13] */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Class selector for event containers [cite: 12] */
+.eventCard { 
+    border: 1px solid #ccc; /* Add border to .eventCard [cite: 19] */
+    padding: 15px; /* Add padding to .eventCard [cite: 19] */
+    margin: 10px; /* Add margin to .eventCard [cite: 19] */
+    border-radius: 8px; 
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1); 
+    background-color: rgba(249, 249, 249, 0.9); /* Use RGBA for background color [cite: 13] */
+    color: #333333; /* Use HEX for text color [cite: 13] */
+}
+
+/* Grouping selector for h3 and p elements [cite: 12] */
+h3, p { 
+    line-height: 1.5; 
+    margin-bottom: 10px; 
+}
+
+/* Body background styling [cite: 4] */
+body {
+    background-image: url('https://via.placeholder.com/1920x1080/ADD8E6/FFFFFF?text=Community+Background'); /* Add a background image to the body [cite: 13] */
+    background-color: #add8e6; /* Fallback color for background [cite: 13] */
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Typography styles */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Use @import to include a Google Font [cite: 14] */
+
+body {
+    font-family: 'Roboto', sans-serif; /* Set font-family [cite: 14] */
+    font-size: 16px; /* Set font-size [cite: 14] */
+}
+
+section p {
+    text-align: justify; /* Use text-align [cite: 14] */
+    text-transform: none; /* Use text-transform [cite: 14] */
+    letter-spacing: 0.5px; /* Use letter-spacing [cite: 14] */
+    line-height: 1.8; /* Use line-height on descriptions [cite: 14] */
+}
+
+h1 {
+    font-weight: 700; /* Set font-weight [cite: 14] */
+    font-style: normal; /* Set font-style [cite: 14] */
+}
+
+/* Link styling [cite: 15] */
+a:link { 
+    color: #007bff; /* Unvisited link */
+    text-decoration: none; 
+}
+
+a:visited { 
+    color: #6610f2; /* Visited link */
+}
+
+a:hover { 
+    color: #0056b3; /* Mouse over link */
+    text-decoration: underline; 
+}
+
+a:active { 
+    color: #dc3545; /* Selected link */
+}
+
+/* List styling [cite: 15] */
+nav ul {
+    list-style-type: none; /* Remove bullets from nav menus [cite: 15] */
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 5px 0; /* Add padding to list items for spacing [cite: 15] */
+    margin: 0 10px; /* Add margin to list items for spacing [cite: 15] */
+}
+
+ul.event-list {
+    list-style-type: square; /* Use list-style-type [cite: 15] */
+    list-style-position: inside; /* Use list-style-position [cite: 15] */
+    padding-left: 20px;
+}
+
+ul.event-list li {
+    margin-bottom: 5px;
+    padding: 3px;
+}
+
+
+/* Table styling [cite: 16] */
+table { 
+    width: 100%; 
+    border-collapse: collapse; /* Use border-collapse: collapse [cite: 17] */
+    margin-top: 20px; 
+}
+
+th, td { 
+    border: 1px solid #ddd; /* Style table, th, and td with borders [cite: 16] */
+    padding: 8px; /* Style table, th, and td with padding [cite: 16] */
+    text-align: left; /* Use text-align: center (adjust to left for better readability) [cite: 17] */
+    background-color: #f2f2f2; /* Style table, th, and td with background color [cite: 16] */
+}
+
+th { 
+    background-color: #007bff; 
+    color: white; 
+    text-align: center; /* Use text-align: center [cite: 17] */
+}
+
+tr:nth-child(even) { /* Add zebra striping to rows using nth-child(even) [cite: 17] */
+    background-color: #f9f9f9; 
+}
+
+/* Outline for selected fields in a form [cite: 19] */
+input:focus, select:focus, textarea:focus {
+    outline: 2px solid #007bff; /* Add outline to highlight selected fields in a form [cite: 19] */
+}
+
+/* Compare visibility: hidden vs. display: none */
+.hidden-visibility {
+    visibility: hidden; /* Element is hidden, but still takes up space in the layout [cite: 19] */
+}
+
+.hidden-display {
+    display: none; /* Element is completely removed from the document flow and does not take up any space [cite: 19] */
+}
+
+/* Multiple Columns in Text [cite: 20] */
+.news-article {
+    column-count: 2; /* Apply column-count: 2 [cite: 20] */
+    column-gap: 30px; /* Apply column-gap: 30px [cite: 20] */
+    column-rule: 1px solid gray; /* Apply column-rule: 1px solid gray [cite: 20] */
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+/* Responsive Web Design with Media Queries [cite: 22] */
+@media screen and (max-width: 768px) { /* Add a media query for screens smaller than 768px [cite: 22] */
+    nav ul li {
+        display: block; /* Stack navigation links vertically instead of horizontally [cite: 22] */
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    img {
+        max-width: 90%; /* Reduce image sizes [cite: 22] */
+        height: auto;
+    }
+
+    body {
+        font-size: 14px; /* Reduce font sizes [cite: 22] */
+    }
+
+    .news-article {
+        column-count: 1; /* For smaller screens, revert to single column */
+    }
+
+    .eventCard {
+        width: 100%; /* Flexible layout using percentage [cite: 22] */
+    }
+}
+
+/* Flexible layouts using vw, vh [cite: 22] */
+h1 {
+    font-size: 5vw; /* Font size relative to viewport width */
+}
+
+.hero-section {
+    height: 50vh; /* Height relative to viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f8ff;
+}

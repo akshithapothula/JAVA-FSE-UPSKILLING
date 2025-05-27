@@ -1,0 +1,781 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Community Event Portal</title>
+</head>
+<body>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#events">Events</a>
+        <a href="#contact">Contact</a>
+        <a href="help.html" target="_blank">Help</a>
+    </nav>
+
+    <main>
+        <section id="home">
+            <div id="welcomeBanner">
+                <h1>Welcome to the Community Portal</h1>
+                <p class="highlight">Enjoy our upcoming local events!</p>
+                <p><span style="color:red; font-weight:bold;">Special Offer: 50% Off!</span></p>
+            </div>
+        </section>
+
+        <section id="events">
+            <h2>Past Event Highlights</h2>
+            <table class="gallery">
+                <caption>Community Events Gallery</caption>
+                <tr>
+                    <td><img src="https://via.placeholder.com/150/FF5733/FFFFFF?text=Music+Fest" alt="Music Fest" title="Music Fest" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/33FF57/FFFFFF?text=Art+Fair" alt="Art Fair" title="Art Fair" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/5733FF/FFFFFF?text=Tech+Expo" alt="Tech Expo" title="Tech Expo" ondblclick="enlargeImage(this)"/></td>
+                </tr>
+                <tr>
+                    <td><img src="https://via.placeholder.com/150/FFC300/FFFFFF?text=Food+Carnival" alt="Food Carnival" title="Food Carnival" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/33C3FF/FFFFFF?text=Comm+Parade" alt="Community Parade" title="Community Parade" ondblclick="enlargeImage(this)"/></td>
+                    <td><img src="https://via.placeholder.com/150/C3FF33/FFFFFF?text=Book+Fest" alt="Book Fest" title="Book Fest" ondblclick="enlargeImage(this)"/></td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="contact">
+            <h2>Register for an Event</h2>
+            <form id="registration-form">
+                <input type="text" name="name" placeholder="Your Name" required autofocus>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Phone (10 digits)" onblur="validatePhone(this)">
+                <input type="date" name="date" required>
+                <select id="eventType" name="eventType" onchange="showFee(this)">
+                    <option value="">--Select Event--</option>
+                    <option value="Music">Music</option>
+                    <option value="Art">Art</option>
+                    <option value="Tech">Tech</option>
+                </select>
+                <p id="fee">Fee: N/A</p>
+                <textarea name="message" placeholder="Your message..." onkeyup="countChars(this)"></textarea>
+                <p id="charCount">Characters: 0</p>
+                <button type="submit" id="submit-reg-btn">Submit</button>
+                <output id="confirmation"></output>
+            </form>
+        </section>
+
+        <section>
+            <h2>Watch Our Promo</h2>
+            <video controls oncanplay="showVideoReady()">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <p id="videoStatus"></p>
+        </section>
+
+        <section>
+            <h2>Find Nearby Events</h2>
+            <button onclick="findLocation()">Find Nearby Events</button>
+            <p id="location"></p>
+        </section>
+
+        <section>
+            <button onclick="clearPrefs()">Clear Preferences</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 City Community Portal</p>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
+
+// Define Event class for Modules 5, 6, 7, 8, 9, 10, 11, 12
+class Event {
+    constructor(name, date, totalSeats, category) {
+        this.name = name;
+        this.date = date;
+        this.totalSeats = totalSeats;
+        this.registered = 0;
+        this.category = category;
+    }
+
+    checkAvailability() {
+        return this.totalSeats - this.registered;
+    }
+
+    register() {
+        if (this.registered < this.totalSeats) {
+            this.registered++;
+            return true;
+        }
+        return false;
+    }
+}
+
+// Initial events (from Module 6 and 9 examples)
+const allEvents = [];
+allEvents.push(new Event("Local Food Festival", "2025-06-20", 500, "Food"));
+allEvents.push(new Event("Photography Exhibition", "2025-07-01", 100, "Art"));
+allEvents.push(new Event("Music Marathon", "2025-08-10", 300, "Music"));
+allEvents.push(new Event("Workshop on Baking", "2025-09-05", 20, "Food"));
+allEvents.push(new Event("Community Picnic", "2025-06-15", 150, "Social")); // From Module 10
+
+// Constants for form elements
+const registrationForm = document.getElementById('registration-form');
+const regNameInput = document.getElementById('name');
+const regEmailInput = document.getElementById('email');
+const regEventSelect = document.getElementById('eventType'); // Use the existing 'eventType' select
+const nameError = document.createElement('span'); // Create error message elements
+nameError.classList.add('error-message');
+regNameInput.after(nameError);
+
+const emailError = document.createElement('span');
+emailError.classList.add('error-message');
+regEmailInput.after(emailError);
+
+const eventError = document.createElement('span');
+eventError.classList.add('error-message');
+regEventSelect.after(eventError);
+
+const formStatus = document.getElementById('confirmation'); // Use the existing 'confirmation' output
+
+// Module 1: JavaScript Basics & Setup - window.onload
+window.onload = function() {
+    console.log("Welcome to the Community Portal");
+    alert("The Community Portal page is fully loaded!");
+
+    // Load stored event type (from original HTML script)
+    const savedType = localStorage.getItem('eventType');
+    if (savedType) document.getElementById('eventType').value = savedType;
+    // Initialize fee display if an event type is already selected
+    const eventTypeSelect = document.getElementById('eventType');
+    if (eventTypeSelect.value) {
+        showFee(eventTypeSelect);
+    }
+    populateEventDropdown(); // Populate dropdown on load (for Modules 11/12)
+};
+
+// Module 11/12: Populate event select dropdown
+function populateEventDropdown() {
+    regEventSelect.innerHTML = '<option value="">--Select an Event--</option>';
+    allEvents.forEach(event => {
+        const option = document.createElement('option');
+        option.value = event.name;
+        option.textContent = ${event.name} (${event.checkAvailability()} seats left);
+        regEventSelect.appendChild(option);
+    });
+}
+
+// Functions from original HTML script (Module 2, 3, 5, 8, 11, 13)
+function validatePhone(el) {
+    if (!/^\d{10}$/.test(el.value) && el.value !== "") {
+        alert("Please enter a 10-digit phone number (e.g., 1234567890).");
+        el.focus();
+    }
+}
+
+function showFee(el) {
+    const fee = { "Music": "$10", "Art": "$15", "Tech": "$20", "Food": "$5", "Social": "$8" }; // Added more categories based on allEvents
+    document.getElementById('fee').textContent = Fee: ${fee[el.value] || 'N/A'}; // Corrected template literal
+    localStorage.setItem('eventType', el.value);
+}
+
+// Renamed from confirmSubmit to handle AJAX submission for Module 12
+const MOCK_REGISTRATION_API = 'https://jsonplaceholder.typicode.com/posts'; // Mock API for POST requests
+
+registrationForm.addEventListener('submit', async function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Clear previous errors
+    nameError.textContent = '';
+    emailError.textContent = '';
+    eventError.textContent = '';
+    formStatus.textContent = '';
+    formStatus.style.color = 'black';
+
+    let isValid = true;
+
+    const name = registrationForm.elements.name.value.trim();
+    const email = registrationForm.elements.email.value.trim();
+    const phone = registrationForm.elements.phone.value.trim(); // Get phone
+    const date = registrationForm.elements.date.value; // Get date
+    const selectedEventName = registrationForm.elements.eventType.value; // Use 'eventType'
+    const message = registrationForm.elements.message.value.trim(); // Get message
+
+    if (name === '') {
+        nameError.textContent = 'Name is required.';
+        isValid = false;
+    }
+
+    if (email === '') {
+        emailError.textContent = 'Email is required.';
+        isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailError.textContent = 'Invalid email format.';
+        isValid = false;
+    }
+
+    if (selectedEventName === '') {
+        eventError.textContent = 'Please select an event.';
+        isValid = false;
+    }
+
+    if (isValid) {
+        formStatus.textContent = 'Submitting registration...';
+        formStatus.style.color = 'blue';
+
+        const registrationData = {
+            name: name,
+            email: email,
+            phone: phone, // Include phone
+            eventDate: date, // Include date
+            eventName: selectedEventName,
+            message: message, // Include message
+            timestamp: new Date().toISOString()
+        };
+
+        console.log("Sending registration payload:", registrationData); // For Module 13 debugging
+
+        try {
+            // Simulate a delayed response (Module 12)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const response = await fetch(MOCK_REGISTRATION_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registrationData),
+            });
+
+            console.log("Fetch response received, status:", response.status); // For Module 13 debugging
+
+            if (!response.ok) {
+                throw new Error(HTTP error! status: ${response.status});
+            }
+
+            const responseData = await response.json();
+            console.log('Registration successful, response data:', responseData); // For Module 13 debugging
+
+            formStatus.textContent = 'Registration successful! Confirmation sent to your email.';
+            formStatus.style.color = 'green';
+
+            // Simulate updating event seats locally if the API confirms
+            const eventToUpdate = allEvents.find(e => e.name === selectedEventName);
+            if (eventToUpdate) {
+                eventToUpdate.register(); // Decrement seats
+                // updateEventUI(selectedEventName); // This function is for dynamic event cards, not directly used here
+            }
+            populateEventDropdown(); // Refresh dropdown for updated seat counts
+            registrationForm.reset(); // Clear form
+            document.getElementById('fee').textContent = "Fee: N/A"; // Reset fee display after form clear
+            document.getElementById('charCount').textContent = "Characters: 0"; // Reset char count
+        } catch (error) {
+            console.error('Registration failed:', error); // For Module 13 debugging
+            formStatus.textContent = Registration failed: ${error.message};
+            formStatus.style.color = 'red';
+        }
+    } else {
+        console.log("Form validation failed."); // For Module 13 debugging
+        formStatus.textContent = 'Please correct the errors in the form.';
+        formStatus.style.color = 'red';
+    }
+});
+
+
+function enlargeImage(el) {
+    if (el.style.width === "300px") {
+        el.style.width = "150px";
+        el.style.height = "100px";
+        el.style.zIndex = "1";
+        el.style.position = "static";
+    } else {
+        el.style.width = "300px";
+        el.style.height = "auto";
+        el.style.zIndex = "10";
+        el.style.position = "relative";
+    }
+}
+
+function countChars(el) {
+    document.getElementById('charCount').textContent = Characters: ${el.value.length};
+}
+
+function findLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                document.getElementById('location').textContent =
+                    Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)};
+            },
+            err => alert("Geolocation failed: " + err.message),
+            { enableHighAccuracy: true }
+        );
+    } else {
+        alert("Geolocation not supported by this browser.");
+    }
+}
+
+function clearPrefs() {
+    localStorage.clear();
+    sessionStorage.clear();
+    document.getElementById('eventType').value = "";
+    document.getElementById('fee').textContent = "Fee: N/A";
+    alert("Preferences cleared.");
+}
+
+window.onbeforeunload = function() {
+    const nameField = document.querySelector('input[name="name"]');
+    const emailField = document.querySelector('input[name="email"]');
+    if (nameField && emailField && (nameField.value !== '' || emailField.value !== '')) {
+        return "You have unsaved changes in the form. Are you sure you want to leave?";
+    }
+};
+
+function showVideoReady() {
+    document.getElementById('videoStatus').textContent = "Video ready to play.";
+}
+
+// Module 2: Syntax, Data Types, and Operators (example usage)
+const eventName = "Summer Music Festival";
+const eventDate = "2025-07-15";
+let availableSeats = 100;
+const eventInfo = Event: ${eventName}, Date: ${eventDate}, Seats Available: ${availableSeats};
+console.log(eventInfo);
+availableSeats--;
+console.log(Seats after one registration: ${availableSeats});
+
+// Module 3: Conditionals, Loops, and Error Handling (simplified example, full logic is in the form submission)
+const today = new Date("2025-05-27");
+function registerUser(eventNameToRegister) {
+    try {
+        const eventToRegister = allEvents.find(event => event.name === eventNameToRegister);
+        if (!eventToRegister) {
+            throw new Error(Event "${eventNameToRegister}" not found.);
+        }
+        if (eventToRegister.registered >= eventToRegister.totalSeats) {
+            throw new Error(Sorry, "${eventNameToRegister}" is full.);
+        }
+        eventToRegister.registered++;
+        console.log(Successfully registered for ${eventNameToRegister}. Total registered: ${eventToRegister.registered});
+    } catch (error) {
+        console.error(Registration Error: ${error.message});
+    }
+}
+// registerUser("Music Marathon"); // Example call, actual registration is via form
+
+// Module 4: Functions, Scope, Closures, Higher-Order Functions
+function addEvent(name, date, seats, category) {
+    allEvents.push(new Event(name, date, seats, category));
+    console.log(Event "${name}" added.);
+}
+
+function createCategoryRegistrationTracker(category) {
+    let totalCategoryRegistrations = 0;
+    return function(registrationCount = 1) {
+        totalCategoryRegistrations += registrationCount;
+        console.log(Total registrations for ${category} category: ${totalCategoryRegistrations});
+        return totalCategoryRegistrations;
+    };
+}
+const musicTracker = createCategoryRegistrationTracker("Music");
+// musicTracker(); // Example call
+
+function filterEvents(eventsList, filterCondition) {
+    return eventsList.filter(filterCondition);
+}
+// const musicEvents = filterEvents(allEvents, event => event.category === "Music");
+// console.log("Music Events:", musicEvents.map(e => e.name));
+
+// Module 7 & 8: DOM Manipulation & Event Handling (basic rendering example)
+// The HTML uses specific IDs for form elements and their functions, so direct DOM manipulation for event cards
+// is not explicitly needed as the registration form handles the main interaction.
+// However, if you were to dynamically render event cards outside the table:
+/*
+const eventsContainer = document.querySelector('#events'); // Or a new container div
+function renderDynamicEvents() {
+    // This would replace the static table if desired
+    // eventsContainer.innerHTML = '';
+    // allEvents.forEach(event => {
+    //     const eventCard = document.createElement('div');
+    //     eventCard.classList.add('event-card'); // Use .eventCard class from CSS
+    //     eventCard.innerHTML = `
+    //         <h3>${event.name}</h3>
+    //         <p>Date: ${event.date}</p>
+    //         <p>Category: ${event.category}</p>
+    //         <p>Seats Available: ${event.checkAvailability()}</p>
+    //         <button class="register-btn" data-event-name="${event.name}">Register</button>
+    //     `;
+    //     eventsContainer.appendChild(eventCard);
+    // });
+}
+// renderDynamicEvents();
+*/
+
+// Module 14: jQuery and JS Frameworks
+// This section is for conceptual understanding as jQuery is not loaded in the provided HTML.
+// If you uncomment this, you must include the jQuery CDN in index.html as specified in Module 14.
+/*
+$(document).ready(function() {
+    // Example of using jQuery for event handling on dynamically added elements
+    // This would work if event cards were dynamically generated and had a '.register-btn' class
+    $('#events-container').on('click', '.register-btn', function() {
+        const eventName = $(this).data('eventName');
+        // ... registration logic using jQuery ...
+    });
+
+    // Example of using fadeIn/fadeOut for event cards
+    $('.event-card').fadeOut(500, function() {
+        $(this).fadeIn(500);
+    });
+});
+
+console.log("One major benefit of moving to modern JavaScript frameworks like React or Vue is Declarative UI.");
+console.log("Instead of manually manipulating the DOM to reflect state changes, you describe what your UI should look like based on your data. The framework then efficiently handles the actual DOM updates, simplifying complex UI development and making components reusable and easier to reason about.");
+*/
+
+/* Header styles */
+#mainHeader { /* ID selector for the banner */
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Universal selector to reset margin/padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+/* Style for all h2 elements */
+h2 {
+    color: #0056b3;
+    margin-bottom: 15px;
+    text-align: center;
+    background: linear-gradient(to right, #e0e0e0, #ffffff); /* Apply gradients to section headers */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Class selector for event containers */
+.eventCard {
+    border: 1px solid #ccc; /* Add border to .eventCard */
+    padding: 15px; /* Add padding to .eventCard */
+    margin: 10px; /* Add margin to .eventCard */
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    background-color: rgba(249, 249, 249, 0.9); /* Use RGBA for background color */
+    color: #333333; /* Use HEX for text color */
+}
+
+/* Grouping selector for h3 and p elements */
+h3, p {
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+/* Body background styling */
+body {
+    background-image: url('https://via.placeholder.com/1920x1080/ADD8E6/FFFFFF?text=Community+Background'); /* Add a background image to the body */
+    background-color: #add8e6; /* Fallback color for background */
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Typography styles */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Use @import to include a Google Font */
+
+body {
+    font-family: 'Roboto', sans-serif; /* Set font-family */
+    font-size: 16px; /* Set font-size */
+}
+
+section p {
+    text-align: justify; /* Use text-align */
+    text-transform: none; /* Use text-transform */
+    letter-spacing: 0.5px; /* Use letter-spacing */
+    line-height: 1.8; /* Use line-height on descriptions */
+}
+
+h1 {
+    font-weight: 700; /* Set font-weight */
+    font-style: normal; /* Set font-style */
+}
+
+/* Link styling */
+a:link {
+    color: #007bff; /* Unvisited link */
+    text-decoration: none;
+}
+
+a:visited {
+    color: #6610f2; /* Visited link */
+}
+
+a:hover {
+    color: #0056b3; /* Mouse over link */
+    text-decoration: underline;
+}
+
+a:active {
+    color: #dc3545; /* Selected link */
+}
+
+/* List styling */
+nav ul {
+    list-style-type: none; /* Remove bullets from nav menus */
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 5px 0; /* Add padding to list items for spacing */
+    margin: 0 10px; /* Add margin to list items for spacing */
+}
+
+ul.event-list {
+    list-style-type: square; /* Use list-style-type */
+    list-style-position: inside; /* Use list-style-position */
+    padding-left: 20px;
+}
+
+ul.event-list li {
+    margin-bottom: 5px;
+    padding: 3px;
+}
+
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Use border-collapse: collapse */
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd; /* Style table, th, and td with borders */
+    padding: 8px; /* Style table, th, and td with padding */
+    text-align: left; /* Use text-align: center (adjust to left for better readability) */
+    background-color: #f2f2f2; /* Style table, th, and td with background color */
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    text-align: center; /* Use text-align: center */
+}
+
+tr:nth-child(even) { /* Add zebra striping to rows using nth-child(even) */
+    background-color: #f9f9f9;
+}
+
+/* Outline for selected fields in a form */
+input:focus, select:focus, textarea:focus {
+    outline: 2px solid #007bff; /* Add outline to highlight selected fields in a form */
+}
+
+/* Compare visibility: hidden vs. display: none */
+.hidden-visibility {
+    visibility: hidden; /* Element is hidden, but still takes up space in the layout */
+}
+
+.hidden-display {
+    display: none; /* Element is completely removed from the document flow and does not take up any space */
+}
+
+/* Multiple Columns in Text */
+.news-article {
+    column-count: 2; /* Apply column-count: 2 */
+    column-gap: 30px; /* Apply column-gap: 30px */
+    column-rule: 1px solid gray; /* Apply column-rule: 1px solid gray */
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+/* Responsive Web Design with Media Queries */
+@media screen and (max-width: 768px) { /* Add a media query for screens smaller than 768px */
+    nav ul li {
+        display: block; /* Stack navigation links vertically instead of horizontally */
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    img {
+        max-width: 90%; /* Reduce image sizes */
+        height: auto;
+    }
+
+    body {
+        font-size: 14px; /* Reduce font sizes */
+    }
+
+    .news-article {
+        column-count: 1; /* For smaller screens, revert to single column */
+    }
+
+    .eventCard {
+        width: 100%; /* Flexible layout using percentage */
+    }
+}
+
+/* Flexible layouts using vw, vh */
+h1 {
+    font-size: 5vw; /* Font size relative to viewport width */
+}
+
+.hero-section {
+    height: 50vh; /* Height relative to viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f8ff;
+}
+
+/* Custom styles based on problem statement */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.6;
+}
+
+nav {
+    margin-bottom: 30px;
+}
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: darkblue;
+    padding: 5px 0;
+}
+
+section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+#welcomeBanner {
+    background-color: lightblue;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+#welcomeBanner h1 {
+    margin-bottom: 10px;
+}
+#welcomeBanner p {
+    margin-bottom: 5px;
+}
+
+.highlight {
+    background-color: yellow;
+    padding: 2px 5px;
+}
+
+.gallery {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 15px;
+    margin-top: 20px;
+}
+.gallery caption {
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.gallery img {
+    border: 2px solid #ccc;
+    width: 150px;
+    height: 100px;
+    display: block;
+    margin: auto;
+    transition: transform 0.2s ease-in-out;
+}
+.gallery img:hover {
+    transform: scale(1.05);
+}
+
+form {
+    margin-top: 20px;
+}
+form input,
+select,
+textarea {
+    display: block;
+    width: calc(100% - 22px);
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+form button {
+    padding: 10px 20px;
+    background-color: darkblue;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+form button:hover {
+    background-color: #003366;
+}
+#fee, #charCount {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+#confirmation {
+    margin-left: 10px;
+    color: green;
+    font-weight: bold;
+}
+
+video {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+#videoStatus {
+    margin-top: 10px;
+    font-style: italic;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+button:hover {
+    background-color: #45a049;
+}
+#location {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+footer {
+    margin-top: 40px;
+    text-align: center;
+    padding: 15px;
+    background-color: #f2f2f2;
+    border-top: 1px solid #e7e7e7;
+}

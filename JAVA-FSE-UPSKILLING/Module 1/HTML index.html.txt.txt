@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Community Event Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6; /* Improves readability of text */
+    }
+
+    /* Navigation Spacing */
+    nav {
+      margin-bottom: 30px; /* Space below navigation */
+    }
+    nav a {
+      margin: 0 15px; /* More space between nav links */
+      text-decoration: none;
+      color: darkblue;
+      padding: 5px 0; /* Add some padding for better click area */
+    }
+
+    /* Section Spacing */
+    section {
+      margin-bottom: 40px; /* Space between major sections */
+      padding: 20px; /* Internal padding for sections */
+      border: 1px solid #eee; /* Light border for visual separation */
+      border-radius: 8px; /* Slightly rounded corners */
+      background-color: #fff; /* White background for sections */
+    }
+
+    /* Welcome Banner Specific Spacing */
+    #welcomeBanner {
+      background-color: lightblue;
+      padding: 20px; /* More padding inside the banner */
+      margin-bottom: 30px; /* Space below banner */
+      border-radius: 8px;
+    }
+    #welcomeBanner h1 {
+      margin-bottom: 10px; /* Space below heading */
+    }
+    #welcomeBanner p {
+      margin-bottom: 5px; /* Space between paragraphs in banner */
+    }
+
+    /* Highlight class for specific text */
+    .highlight {
+      background-color: yellow;
+      padding: 2px 5px; /* Small padding for highlight */
+    }
+
+    /* Image Gallery Spacing */
+    .gallery {
+      width: 100%;
+      border-collapse: separate; /* Allows for spacing between cells */
+      border-spacing: 15px; /* Space between table cells (images) */
+      margin-top: 20px;
+    }
+    .gallery caption {
+      margin-bottom: 15px; /* Space below caption */
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .gallery img {
+      border: 2px solid #ccc;
+      width: 150px;
+      height: 100px;
+      display: block; /* Ensures images behave like blocks for margin */
+      margin: auto; /* Center images in their cells */
+      transition: transform 0.2s ease-in-out; /* Smooth transition for enlarge */
+    }
+    .gallery img:hover {
+      transform: scale(1.05); /* Slight zoom on hover */
+    }
+
+    /* Form Element Spacing */
+    form {
+      margin-top: 20px;
+    }
+    form input,
+    select,
+    textarea {
+      display: block;
+      width: calc(100% - 22px); /* Full width minus padding and border */
+      margin-bottom: 15px; /* Space below each form element */
+      padding: 10px; /* More padding for input fields */
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    form button {
+      padding: 10px 20px;
+      background-color: darkblue;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px; /* Space above button */
+    }
+    form button:hover {
+      background-color: #003366; /* Darker blue on hover */
+    }
+    #fee, #charCount {
+      margin-bottom: 15px; /* Space below fee and char count info */
+      font-weight: bold;
+    }
+    #confirmation {
+      margin-left: 10px; /* Space to the left of confirmation message */
+      color: green;
+      font-weight: bold;
+    }
+
+    /* Video Section Spacing */
+    video {
+      width: 100%; /* Make video responsive */
+      max-width: 500px; /* Limit max width */
+      margin-top: 20px;
+      display: block; /* To center the video */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #videoStatus {
+      margin-top: 10px; /* Space above video status */
+      font-style: italic;
+    }
+
+    /* Geolocation and Clear Preferences Buttons */
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50; /* Green button */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px; /* Space between buttons */
+      margin-top: 10px; /* Space above buttons */
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #location {
+      margin-top: 15px; /* Space below location text */
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Footer Spacing */
+    footer {
+      margin-top: 40px; /* Space above footer */
+      text-align: center;
+      padding: 15px;
+      background-color: #f2f2f2;
+      border-top: 1px solid #e7e7e7;
+    }
+  </style>
+  <script>
+    window.onload = function() {
+      // Load stored event type
+      const savedType = localStorage.getItem('eventType');
+      if (savedType) document.getElementById('eventType').value = savedType;
+      // Initialize fee display if an event type is already selected
+      const eventTypeSelect = document.getElementById('eventType');
+      if (eventTypeSelect.value) {
+        showFee(eventTypeSelect);
+      }
+    };
+
+    function validatePhone(el) {
+      if (!/^\d{10}$/.test(el.value)) alert("Enter a 10-digit phone number.");
+    }
+
+    function showFee(el) {
+      const fee = { Music: "$10", Art: "$15", Tech: "$20" };
+      document.getElementById('fee').textContent = Fee: ${fee[el.value] || 'N/A'};
+      localStorage.setItem('eventType', el.value);
+    }
+
+    function confirmSubmit() {
+      document.getElementById('confirmation').value = "Registration submitted!";
+      return false; // Prevent actual form submission for demo
+    }
+
+    function enlargeImage(el) {
+      el.style.width = "300px";
+      el.style.height = "auto"; // Maintain aspect ratio
+      el.style.zIndex = "10"; // Bring enlarged image to front
+      el.style.position = "relative"; // Allow z-index to work
+    }
+
+    function countChars(el) {
+      document.getElementById('charCount').textContent = Characters: ${el.value.length};
+    }
+
+    function findLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            document.getElementById('location').textContent =
+              Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)};
+          },
+          err => alert("Geolocation failed: " + err.message),
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert("Geolocation not supported.");
+      }
+    }
+
+    function clearPrefs() {
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Preferences cleared.");
+    }
+
+    window.onbeforeunload = function() {
+      // return "You have unsaved changes. Are you sure you want to leave?"; // Uncomment to re-enable
+    };
+
+    function showVideoReady() {
+      document.getElementById('videoStatus').textContent = "Video ready to play.";
+    }
+  </script>
+</head>
+<body>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#events">Events</a>
+    <a href="#contact">Contact</a>
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <main>
+    <section id="home">
+      <div id="welcomeBanner">
+        <h1>Welcome to the Community Portal</h1>
+        <p class="highlight">Enjoy our upcoming local events!</p>
+        <p><span style="color:red; font-weight:bold;">Special Offer: 50% Off!</span></p>
+      </div>
+    </section>
+
+    <section id="events">
+      <h2>Past Event Highlights</h2>
+      <table class="gallery">
+        <caption>Community Events Gallery</caption>
+        <tr>
+          <td><img src="event1.jpg" alt="Music Fest" title="Music Fest" ondblclick="enlargeImage(this)"/></td>
+          <td><img src="event2.jpg" alt="Art Fair" title="Art Fair" ondblclick="enlargeImage(this)"/></td>
+          <td><img src="event3.jpg" alt="Tech Expo" title="Tech Expo" ondblclick="enlargeImage(this)"/></td>
+        </tr>
+        <tr>
+          <td><img src="event4.jpg" alt="Food Carnival" title="Food Carnival" ondblclick="enlargeImage(this)"/></td>
+          <td><img src="event5.jpg" alt="Community Parade" title="Community Parade" ondblclick="enlargeImage(this)"/></td>
+          <td><img src="event6.jpg" alt="Book Fest" title="Book Fest" ondblclick="enlargeImage(this)"/></td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="contact">
+      <h2>Register for an Event</h2>
+      <form onsubmit="return confirmSubmit();">
+        <input type="text" name="name" placeholder="Your Name" required autofocus>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <input type="tel" name="phone" placeholder="Phone (10 digits)" onblur="validatePhone(this)">
+        <input type="date" name="date" required>
+        <select id="eventType" name="eventType" onchange="showFee(this)">
+          <option value="">--Select Event--</option>
+          <option value="Music">Music</option>
+          <option value="Art">Art</option>
+          <option value="Tech">Tech</option>
+        </select>
+        <p id="fee">Fee: N/A</p>
+        <textarea name="message" placeholder="Your message..." onkeyup="countChars(this)"></textarea>
+        <p id="charCount">Characters: 0</p>
+        <button type="submit">Submit</button>
+        <output id="confirmation"></output>
+      </form>
+    </section>
+
+    <section>
+      <h2>Watch Our Promo</h2>
+      <video controls oncanplay="showVideoReady()">
+        <source src="promo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p id="videoStatus"></p>
+    </section>
+
+    <section>
+      <h2>Find Nearby Events</h2>
+      <button onclick="findLocation()">Find Nearby Events</button>
+      <p id="location"></p>
+    </section>
+
+    <section>
+      <button onclick="clearPrefs()">Clear Preferences</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 City Community Portal</p>
+  </footer>
+
+</body>
+</html>

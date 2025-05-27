@@ -1,0 +1,1295 @@
+
+//22. File Writing
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
+// FileWriting.java
+public class FileWriting {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String fileName = "output.txt";
+
+        // Prompt the user for a string. [cite: 55]
+        System.out.print("Enter a string to write to " + fileName + ": ");
+        String userInput = scanner.nextLine();
+
+        try (FileWriter writer = new FileWriter(fileName)) { // Use try-with-resources for automatic closing
+            writer.write(userInput); // Write the string to a file named output.txt. [cite: 56]
+            System.out.println("Successfully wrote '" + userInput + "' to " + fileName); // Confirm that the data has been written. [cite: 56]
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing to the file: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+    }
+}
+
+
+//23. File Reading
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+// FileReading.java
+public class FileReading {
+    public static void main(String[] args) {
+        String fileName = "output.txt"; // Assumes output.txt was created by the previous exercise
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) { // Open output.txt for reading. [cite: 58]
+            System.out.println("Contents of " + fileName + ":");
+            String line;
+            while ((line = reader.readLine()) != null) { // Read each line and display it on the console. [cite: 58]
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.err.println("An error occurred while reading the file: " + e.getMessage());
+            System.err.println("Please ensure 'output.txt' exists in the same directory.");
+            e.printStackTrace();
+        }
+    }
+}
+
+
+//24. ArrayList Example
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// ArrayListExample.java
+public class ArrayListExample {
+    public static void main(String[] args) {
+        // Create an ArrayList to store names. [cite: 60]
+        ArrayList<String> studentNames = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+        String name;
+
+        System.out.println("Enter student names (type 'done' to finish):");
+
+        // Allow the user to add names to the list. [cite: 60]
+        while (true) {
+            System.out.print("Enter name: ");
+            name = scanner.nextLine();
+            if (name.equalsIgnoreCase("done")) {
+                break;
+            }
+            studentNames.add(name);
+        }
+
+        System.out.println("\n--- Student Names Entered ---");
+        if (studentNames.isEmpty()) {
+            System.out.println("No names were entered.");
+        } else {
+            // Display all names entered. [cite: 60]
+            for (int i = 0; i < studentNames.size(); i++) {
+                System.out.println((i + 1) + ". " + studentNames.get(i));
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+
+
+//25. HashMap Example
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+// HashMapExample.java
+public class HashMapExample {
+    public static void main(String[] args) {
+        // Create a HashMap with Integer keys and String values. [cite: 62]
+        Map<Integer, String> studentMap = new HashMap<>();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter student IDs and names (type ID '0' to finish adding):");
+
+        // Allow the user to add entries. [cite: 62]
+        while (true) {
+            System.out.print("Enter Student ID (0 to finish): ");
+            int id = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (id == 0) {
+                break;
+            }
+
+            System.out.print("Enter Student Name: ");
+            String name = scanner.nextLine();
+
+            studentMap.put(id, name);
+            System.out.println("Added: ID " + id + " -> " + name);
+        }
+
+        System.out.println("\n--- Retrieve Student Names ---");
+        if (studentMap.isEmpty()) {
+            System.out.println("No student data available.");
+        } else {
+            System.out.print("Enter Student ID to retrieve name: ");
+            int searchId = scanner.nextInt();
+
+            // Retrieve and display a name based on an entered ID. [cite: 63]
+            if (studentMap.containsKey(searchId)) {
+                String retrievedName = studentMap.get(searchId);
+                System.out.println("Student ID " + searchId + " corresponds to: " + retrievedName);
+            } else {
+                System.out.println("Student ID " + searchId + " not found.");
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+
+//26. Thread Creation
+// MyRunnable.java (Implements Runnable)
+class MyRunnable implements Runnable {
+    private String threadName;
+
+    public MyRunnable(String name) {
+        this.threadName = name;
+        System.out.println("Creating " + threadName);
+    }
+
+    // In the run() method, print a message multiple times. [cite: 65]
+    @Override
+    public void run() {
+        System.out.println("Running " + threadName);
+        try {
+            for (int i = 0; i < 5; i++) {
+                System.out.println("Thread: " + threadName + ", Count: " + i);
+                // Let the thread sleep for a while.
+                Thread.sleep(50);
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Thread " + threadName + " interrupted.");
+        }
+        System.out.println("Thread " + threadName + " exiting.");
+    }
+}
+
+// MyThread.java (Extends Thread)
+class MyThread extends Thread {
+    private String threadName;
+
+    public MyThread(String name) {
+        this.threadName = name;
+        System.out.println("Creating " + threadName);
+    }
+
+    // In the run() method, print a message multiple times. [cite: 65]
+    @Override
+    public void run() {
+        System.out.println("Running " + threadName);
+        try {
+            for (int i = 0; i < 5; i++) {
+                System.out.println("Thread: " + threadName + ", Count: " + i);
+                Thread.sleep(70); // Different sleep time to show interleaving
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Thread " + threadName + " interrupted.");
+        }
+        System.out.println("Thread " + threadName + " exiting.");
+    }
+}
+
+// ThreadCreation.java (Main class)
+public class ThreadCreation {
+    public static void main(String[] args) {
+        System.out.println("Main Thread Started.");
+
+        // Define a class that extends Thread or implements Runnable. [cite: 64]
+        // Create an instance of the class that implements Runnable
+        MyRunnable runnable1 = new MyRunnable("Runnable-Thread-1");
+        Thread thread1 = new Thread(runnable1);
+
+        // Create an instance of the class that extends Thread
+        MyThread thread2 = new MyThread("Extended-Thread-2");
+
+        // Start both threads and observe the output. [cite: 65]
+        thread1.start(); // Start the thread running the Runnable
+        thread2.start(); // Start the thread extending Thread
+
+        System.out.println("Main Thread Finished.");
+    }
+}
+
+//27. Lambda Expressions
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+// LambdaExpressions.java
+public class LambdaExpressions {
+    public static void main(String[] args) {
+        // Create a List of strings. [cite: 67]
+        List<String> names = new ArrayList<>();
+        names.add("Charlie");
+        names.add("Alice");
+        names.add("Bob");
+        names.add("David");
+
+        System.out.println("Original List: " + names);
+
+        // Use Collections.sort() with a lambda to sort the list. [cite: 67]
+        // The lambda expression (s1, s2) -> s1.compareTo(s2) provides the custom sorting logic
+        // This is equivalent to an anonymous inner class implementing Comparator<String>
+        Collections.sort(names, (s1, s2) -> s1.compareTo(s2));
+
+        // Display the sorted list. [cite: 67]
+        System.out.println("Sorted List (Ascending): " + names);
+
+        // Another example: Sort in descending order
+        Collections.sort(names, (s1, s2) -> s2.compareTo(s1)); // Sort descending
+        System.out.println("Sorted List (Descending): " + names);
+    }
+}
+
+
+//28. Stream API
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// StreamAPIExample.java
+public class StreamAPIExample {
+    public static void main(String[] args) {
+        // Create a List of integers. [cite: 69]
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        System.out.println("Original List: " + numbers);
+
+        // Use the Stream API to filter even numbers. [cite: 69]
+        List<Integer> evenNumbers = numbers.stream() // Create a stream from the list
+                                           .filter(n -> n % 2 == 0) // Filter elements that are even
+                                           .collect(Collectors.toList()); // Collect the filtered elements into a new list
+
+        // Collect and display the result. [cite: 70]
+        System.out.println("Even Numbers (using Stream API): " + evenNumbers);
+
+        // Another example: Map and then filter
+        List<String> doubledAndFiltered = numbers.stream()
+                                                  .map(n -> n * 2) // Double each number
+                                                  .filter(n -> n > 10) // Filter numbers greater than 10
+                                                  .map(String::valueOf) // Convert to String
+                                                  .collect(Collectors.toList());
+        System.out.println("Doubled and Filtered (numbers > 10) as Strings: " + doubledAndFiltered);
+    }
+}
+
+
+//29. Records (Java 16+)
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// Person.java (Record definition)
+// Define a record named Person. [cite: 72]
+record Person(String name, int age) {
+    // Records automatically get:
+    // - A canonical constructor (Person(String name, int age))
+    // - Accessor methods (name(), age())
+    // - toString(), equals(), and hashCode() implementations
+}
+
+// RecordsExample.java (Main class)
+public class RecordsExample {
+    public static void main(String[] args) {
+        // Create instances and print them. [cite: 72]
+        Person person1 = new Person("Alice", 30);
+        Person person2 = new Person("Bob", 25);
+        Person person3 = new Person("Charlie", 35);
+        Person person4 = new Person("David", 20);
+
+        System.out.println("Person 1: " + person1);
+        System.out.println("Person 2: " + person2);
+        System.out.println("Person 1's name: " + person1.name()); // Accessor method
+        System.out.println("Person 2's age: " + person2.age());   // Accessor method
+
+        // Demonstrating equals() and hashCode()
+        Person person1Copy = new Person("Alice", 30);
+        System.out.println("Person 1 equals Person 1 Copy: " + person1.equals(person1Copy)); // true
+
+        // Use records in a List and filter based on age using Streams. [cite: 73]
+        List<Person> people = new ArrayList<>();
+        people.add(person1);
+        people.add(person2);
+        people.add(person3);
+        people.add(person4);
+
+        System.out.println("\nAll people: " + people);
+
+        // Filter people older than 28 using Streams
+        List<Person> olderPeople = people.stream()
+                                        .filter(person -> person.age() > 28)
+                                        .collect(Collectors.toList());
+
+        System.out.println("People older than 28: " + olderPeople);
+    }
+}
+
+//30. Pattern Matching for switch (Java 21)
+// PatternMatchingForSwitch.java
+public class PatternMatchingForSwitch {
+
+    // Create a method that accepts Object as input. [cite: 75]
+    public static void processObject(Object obj) {
+        System.out.print("Processing object of type " + obj.getClass().getSimpleName() + ": ");
+
+        // Use a switch expression to check if the object is Integer, String, Double, etc. [cite: 75]
+        String message = switch (obj) {
+            case Integer i -> "It's an Integer with value: " + i;
+            case String s -> "It's a String with length: " + s.length();
+            case Double d -> "It's a Double with value: " + d;
+            case List<?> list -> "It's a List with " + list.size() + " elements.";
+            case null -> "It's a null object."; // Handle null explicitly (Java 17+)
+            default -> "It's an unknown type.";
+        };
+        // Print a message based on the object's type. [cite: 76]
+        System.out.println(message);
+    }
+
+    public static void main(String[] args) {
+        processObject(10);
+        processObject("Hello Java 21!");
+        processObject(3.14);
+        processObject(List.of("apple", "banana"));
+        processObject(true); // Boolean, will hit default
+        processObject(null);
+    }
+}
+
+
+//31. Basic JDBC Connection
+//For MySQL, download mysql-connector-j-x.x.x.jar.
+//For SQLite, download sqlite-jdbc-x.x.x.jar.
+/*....CREATE DATABASE javadb;
+USE javadb;
+CREATE TABLE students (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    age INT
+);
+INSERT INTO students (name, age) VALUES ('Alice', 20), ('Bob', 22);
+....*/
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+// BasicJDBCConnection.java
+public class BasicJDBCConnection {
+
+    // SQLite connection string
+    private static final String JDBC_URL = "jdbc:sqlite:javadb.db"; // This will create javadb.db if it doesn't exist
+
+    public static void main(String[] args) {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            // Load the JDBC driver (not strictly necessary with modern JDBC 4.0+, but good practice)
+            // Class.forName("org.sqlite.JDBC"); // For SQLite
+
+            // Create a connection. [cite: 78]
+            connection = DriverManager.getConnection(JDBC_URL);
+            System.out.println("Connection to SQLite database established.");
+
+            // Set up a database with a students table. [cite: 78]
+            // This part creates the table if it doesn't exist, making it self-contained
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS students (" +
+                                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                    "name TEXT NOT NULL," +
+                                    "age INTEGER" +
+                                    ");";
+            statement = connection.createStatement();
+            statement.execute(createTableSQL);
+            System.out.println("Ensured 'students' table exists.");
+
+            // Insert some dummy data if the table is empty (optional)
+            try {
+                statement.executeUpdate("INSERT INTO students (name, age) VALUES ('Alice', 20)");
+                statement.executeUpdate("INSERT INTO students (name, age) VALUES ('Bob', 22)");
+                System.out.println("Added initial student data (if table was empty).");
+            } catch (SQLException e) {
+                // Ignore if data already exists (e.g., due to unique constraint or just not inserting duplicates)
+                if (e.getMessage().contains("UNIQUE constraint failed")) {
+                    System.out.println("Initial data already present.");
+                } else {
+                    throw e; // Re-throw other unexpected SQLExceptions
+                }
+            }
+
+
+            // Execute a SELECT query. [cite: 78]
+            String selectSQL = "SELECT id, name, age FROM students";
+            resultSet = statement.executeQuery(selectSQL);
+            System.out.println("\n--- Student Data ---");
+
+            // Print results. [cite: 78]
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                int age = resultSet.getInt("age");
+                System.out.println("ID: " + id + ", Name: " + name + ", Age: " + age);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // Close resources in reverse order of creation
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+                System.out.println("Database resources closed.");
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
+    }
+}
+
+
+//32. Insert and Update Operations in JDBC
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+// StudentDAO.java (Data Access Object)
+class StudentDAO {
+    private static final String JDBC_URL = "jdbc:sqlite:javadb.db"; // Using SQLite for simplicity
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(JDBC_URL);
+    }
+
+    // Implement methods to insert new records [cite: 81]
+    public void insertStudent(String name, int age) {
+        String sql = "INSERT INTO students(name, age) VALUES(?, ?)"; // Use PreparedStatement for parameterized queries. [cite: 82]
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+            pstmt.setInt(2, age);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Student '" + name + "' added successfully.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error inserting student: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Implement methods to update student details. [cite: 81]
+    public void updateStudentAge(int id, int newAge) {
+        String sql = "UPDATE students SET age = ? WHERE id = ?"; // Use PreparedStatement for parameterized queries. [cite: 82]
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, newAge);
+            pstmt.setInt(2, id);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Student with ID " + id + " age updated to " + newAge + ".");
+            } else {
+                System.out.println("No student found with ID " + id + " to update.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error updating student: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void displayAllStudents() {
+        String sql = "SELECT id, name, age FROM students";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            System.out.println("\n--- Current Student Data ---");
+            if (!rs.isBeforeFirst()) { // Check if ResultSet is empty
+                System.out.println("No students found.");
+                return;
+            }
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("id") +
+                                   ", Name: " + rs.getString("name") +
+                                   ", Age: " + rs.getInt("age"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error displaying students: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+// InsertAndUpdateOperations.java (Main class)
+public class InsertAndUpdateOperations {
+    public static void main(String[] args) {
+        StudentDAO studentDAO = new StudentDAO();
+        Scanner scanner = new Scanner(System.in);
+
+        // Ensure the table exists from the previous exercise or create it here
+        try (Connection conn = studentDAO.getConnection(); Statement stmt = conn.createStatement()) {
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS students (" +
+                                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                    "name TEXT NOT NULL," +
+                                    "age INTEGER" +
+                                    ");";
+            stmt.execute(createTableSQL);
+            System.out.println("Ensured 'students' table exists for operations.");
+        } catch (SQLException e) {
+            System.err.println("Error setting up table: " + e.getMessage());
+            return;
+        }
+
+        int choice;
+        do {
+            System.out.println("\n--- Student Management ---");
+            System.out.println("1. Add New Student");
+            System.out.println("2. Update Student Age");
+            System.out.println("3. View All Students");
+            System.out.println("0. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter student name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter student age: ");
+                    int age = scanner.nextInt();
+                    scanner.nextLine();
+                    studentDAO.insertStudent(name, age);
+                    break;
+                case 2:
+                    System.out.print("Enter student ID to update: ");
+                    int id = scanner.nextInt();
+                    System.out.print("Enter new age: ");
+                    int newAge = scanner.nextInt();
+                    scanner.nextLine();
+                    studentDAO.updateStudentAge(id, newAge);
+                    break;
+                case 3:
+                    studentDAO.displayAllStudents();
+                    break;
+                case 0:
+                    System.out.println("Exiting application.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 0);
+
+        scanner.close();
+    }
+}
+
+
+//33. Transaction Handling in JDBC
+/*...
+-- For SQLite:
+CREATE TABLE IF NOT EXISTS accounts (
+    account_id INTEGER PRIMARY KEY,
+    account_holder TEXT NOT NULL,
+    balance REAL NOT NULL
+);
+INSERT INTO accounts (account_id, account_holder, balance) VALUES (101, 'Alice', 1000.00);
+INSERT INTO accounts (account_id, account_holder, balance) VALUES (102, 'Bob', 500.00);
+
+-- For MySQL:
+CREATE TABLE IF NOT EXISTS accounts (
+    account_id INT PRIMARY KEY,
+    account_holder VARCHAR(100) NOT NULL,
+    balance DECIMAL(10, 2) NOT NULL
+);
+INSERT INTO accounts (account_id, account_holder, balance) VALUES (101, 'Alice', 1000.00);
+INSERT INTO accounts (account_id, account_holder, balance) VALUES (102, 'Bob', 500.00);
+...*/
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+// TransactionHandling.java
+public class TransactionHandling {
+
+    private static final String JDBC_URL = "jdbc:sqlite:javadb.db"; // Or your MySQL URL
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(JDBC_URL);
+    }
+
+    // Create accounts table with balances. [cite: 83]
+    public static void setupAccountsTable() {
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (" +
+                                    "account_id INTEGER PRIMARY KEY," +
+                                    "account_holder TEXT NOT NULL," +
+                                    "balance REAL NOT NULL" +
+                                    ");";
+            stmt.execute(createTableSQL);
+
+            // Insert initial data if table is empty
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM accounts");
+            if (rs.next() && rs.getInt(1) == 0) {
+                stmt.executeUpdate("INSERT INTO accounts (account_id, account_holder, balance) VALUES (101, 'Alice', 1000.00)");
+                stmt.executeUpdate("INSERT INTO accounts (account_id, account_holder, balance) VALUES (102, 'Bob', 500.00)");
+                System.out.println("Initial account data inserted.");
+            } else {
+                System.out.println("Accounts table already exists with data.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error setting up accounts table: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void displayBalances() {
+        System.out.println("\n--- Current Account Balances ---");
+        String sql = "SELECT account_id, account_holder, balance FROM accounts";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                System.out.println("Account ID: " + rs.getInt("account_id") +
+                                   ", Holder: " + rs.getString("account_holder") +
+                                   ", Balance: " + rs.getDouble("balance"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error displaying balances: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Implement a transfer method with Connection.setAutoCommit(false). [cite: 84]
+    public static void transferMoney(int fromAccountId, int toAccountId, double amount) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Deduct from sender
+            String deductSql = "UPDATE accounts SET balance = balance - ? WHERE account_id = ? AND balance >= ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(deductSql)) {
+                pstmt.setDouble(1, amount);
+                pstmt.setInt(2, fromAccountId);
+                pstmt.setDouble(3, amount); // Check if sender has sufficient balance
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Insufficient funds or sender account not found for account ID: " + fromAccountId);
+                }
+            }
+
+            // (Optional) Simulate an error to test rollback
+            // if (fromAccountId == 101 && toAccountId == 102 && amount == 100.0) {
+            //     throw new SQLException("Simulating error after deduction.");
+            // }
+
+            // 2. Add to receiver
+            String addSql = "UPDATE accounts SET balance = balance + ? WHERE account_id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(addSql)) {
+                pstmt.setDouble(1, amount);
+                pstmt.setInt(2, toAccountId);
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Receiver account not found for account ID: " + toAccountId);
+                }
+            }
+
+            conn.commit(); // Commit if both debit and credit succeed [cite: 84]
+            System.out.println("Transfer of " + amount + " from " + fromAccountId + " to " + toAccountId + " successful.");
+
+        } catch (SQLException e) {
+            System.err.println("Transfer failed: " + e.getMessage());
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Else rollback. [cite: 84]
+                    System.out.println("Transaction rolled back due to an error.");
+                }
+            } catch (SQLException rollbackEx) {
+                System.err.println("Error during rollback: " + rollbackEx.getMessage());
+            }
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Reset auto-commit mode
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error closing connection: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        setupAccountsTable(); // Ensure the table and initial data are there
+        displayBalances();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("\nEnter sender account ID: ");
+        int fromId = scanner.nextInt();
+        System.out.print("Enter receiver account ID: ");
+        int toId = scanner.nextInt();
+        System.out.print("Enter amount to transfer: ");
+        double amount = scanner.nextDouble();
+
+        transferMoney(fromId, toId, amount);
+        displayBalances(); // Show balances after transfer attempt
+
+        scanner.close();
+    }
+}
+
+//34. Create and Use Java Modules
+/*...
+java-modules-example/
+├── com.greetings/
+│   ├── module-info.java
+│   └── com/
+│       └── greetings/
+│           └── Main.java
+└── com.utils/
+    ├── module-info.java
+    └── com/
+        └── utils/
+            └── StringUtil.java
+
+...*/
+// com.utils/module-info.java
+module com.utils {
+    exports com.utils; // Export a utility class from com.utils [cite: 86]
+}
+
+// com.utils/com/utils/StringUtil.java
+package com.utils;
+
+public class StringUtil {
+    public static String reverse(String str) {
+        return new StringBuilder(str).reverse().toString();
+    }
+
+    public static String toUpperCase(String str) {
+        return str.toUpperCase();
+    }
+}
+
+// com.greetings/module-info.java
+module com.greetings {
+    requires com.utils; // Declare dependency on com.utils
+}
+
+// com.greetings/com/greetings/Main.java
+package com.greetings;
+
+import com.utils.StringUtil; // Use it in com.greetings. [cite: 86]
+
+public class Main {
+    public static void main(String[] args) {
+        String original = "Hello Modules!";
+        String reversed = StringUtil.reverse(original); // Using exported utility
+        String upper = StringUtil.toUpperCase(original); // Using exported utility
+
+        System.out.println("Original String: " + original);
+        System.out.println("Reversed String: " + reversed);
+        System.out.println("Uppercase String: " + upper);
+    }
+}
+
+
+//35. TCP Client-Server Chat
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+// ChatServer.java
+public class ChatServer {
+    private static final int PORT = 12345;
+
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) { // Create a ServerSocket that listens for connections. [cite: 88]
+            System.out.println("Server started. Listening on port " + PORT);
+
+            while (true) { // Keep server running to accept multiple clients sequentially
+                System.out.println("Waiting for a client to connect...");
+                Socket clientSocket = serverSocket.accept(); // Accept client connections [cite: 89]
+                System.out.println("Client connected: " + clientSocket.getInetAddress().getHostAddress());
+
+                // Use InputStream and OutputStream for two-way communication. [cite: 89]
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true); // true for auto-flush
+                Scanner serverInput = new Scanner(System.in);
+
+                String clientMessage;
+                String serverMessage;
+
+                System.out.println("Chat session started. Type 'bye' to end.");
+
+                while (true) {
+                    // Read from client
+                    if (in.ready()) { // Check if data is available without blocking
+                        clientMessage = in.readLine();
+                        if (clientMessage == null || clientMessage.equalsIgnoreCase("bye")) {
+                            System.out.println("Client said 'bye'. Closing connection.");
+                            break;
+                        }
+                        System.out.println("Client: " + clientMessage);
+                    }
+
+                    // Send to client
+                    System.out.print("Server: ");
+                    serverMessage = serverInput.nextLine();
+                    out.println(serverMessage);
+                    if (serverMessage.equalsIgnoreCase("bye")) {
+                        System.out.println("Server said 'bye'. Closing connection.");
+                        break;
+                    }
+                }
+                clientSocket.close();
+                System.out.println("Client disconnected.");
+            }
+        } catch (IOException e) {
+            System.err.println("Server error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+// ChatClient.java
+public class ChatClient {
+    private static final String SERVER_IP = "127.0.0.1"; // localhost
+    private static final int PORT = 12345;
+
+    public static void main(String[] args) {
+        try (Socket socket = new Socket(SERVER_IP, PORT)) {
+            System.out.println("Connected to server " + SERVER_IP + ":" + PORT);
+
+            // Use InputStream and OutputStream for two-way communication. [cite: 89]
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // true for auto-flush
+            Scanner clientInput = new Scanner(System.in);
+
+            String serverMessage;
+            String clientMessage;
+
+            System.out.println("Chat session started. Type 'bye' to end.");
+
+            while (true) {
+                // Send to server
+                System.out.print("Client: ");
+                clientMessage = clientInput.nextLine();
+                out.println(clientMessage);
+                if (clientMessage.equalsIgnoreCase("bye")) {
+                    System.out.println("Client said 'bye'. Closing connection.");
+                    break;
+                }
+
+                // Read from server
+                if (in.ready()) { // Check if data is available without blocking
+                    serverMessage = in.readLine();
+                    if (serverMessage == null || serverMessage.equalsIgnoreCase("bye")) {
+                        System.out.println("Server said 'bye'. Closing connection.");
+                        break;
+                    }
+                    System.out.println("Server: " + serverMessage);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Client error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+
+//36. HTTP Client API (Java 11+)
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.io.IOException;
+
+// HTTPClientAPIExample.java
+public class HTTPClientAPIExample {
+    public static void main(String[] args) {
+        HttpClient client = HttpClient.newHttpClient();
+        String url = "https://api.github.com/users/octocat"; // Example public API
+
+        // Use HttpClient and HttpRequest. [cite: 91]
+        HttpRequest request = HttpRequest.newBuilder()
+                                        .uri(URI.create(url))
+                                        .GET() // Or .POST(HttpRequest.BodyPublishers.ofString("your_json_body")) for POST
+                                        .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Print the response status and body. [cite: 91]
+            System.out.println("Response Status Code: " + response.statusCode());
+            System.out.println("Response Body:\n" + response.body());
+
+            // Optional: Parse JSON response using Jackson or Gson. [cite: 92]
+            // This part is illustrative and requires adding Jackson/Gson libraries to your project.
+            /*
+            // Example using Gson (assuming you have gson-x.x.x.jar in classpath)
+            Gson gson = new Gson();
+            GitHubUser user = gson.fromJson(response.body(), GitHubUser.class);
+            System.out.println("\n--- Parsed JSON (using Gson) ---");
+            System.out.println("User Login: " + user.login);
+            System.out.println("User Name: " + user.name);
+            System.out.println("User Public Repos: " + user.public_repos);
+
+            // Simple class for Gson deserialization
+            class GitHubUser {
+                String login;
+                String name;
+                int public_repos;
+                // Add other fields you want to parse
+            }
+            */
+
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error during HTTP request: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+
+//37. Using javap to Inspect Bytecode
+// MySimpleClass.java
+public class MySimpleClass {
+    private int value = 10;
+
+    // Create a class with a method. [cite: 94]
+    public int add(int a, int b) {
+        int sum = a + b;
+        return sum * value; // Uses an instance variable
+    }
+
+    public static void main(String[] args) {
+        MySimpleClass obj = new MySimpleClass();
+        int result = obj.add(5, 7);
+        System.out.println("Result: " + result);
+    }
+}
+
+//38. Decompile a Class File
+// MySimpleClass.java
+public class MySimpleClass {
+    private int secretValue = 123; // Changed name to see effect of decompilation
+
+    public String getSecretMessage(String prefix) {
+        return prefix + " The secret is: " + secretValue;
+    }
+
+    public static void main(String[] args) {
+        MySimpleClass obj = new MySimpleClass();
+        System.out.println(obj.getSecretMessage("Hello!"));
+    }
+}
+
+//39. Reflection in Java
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
+
+// MyDynamicClass.java (Class to be reflected upon)
+class MyDynamicClass {
+    private String data = "Initial Data";
+
+    public void sayHello() {
+        System.out.println("Hello from MyDynamicClass!");
+    }
+
+    public void greet(String name) {
+        System.out.println("Greetings, " + name + "!");
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String newData) {
+        this.data = newData;
+        System.out.println("Data updated to: " + this.data);
+    }
+
+    private void internalMethod() { // Private method
+        System.out.println("This is a private internal method.");
+    }
+}
+
+// ReflectionInJava.java (Main class)
+public class ReflectionInJava {
+    public static void main(String[] args) {
+        String className = "MyDynamicClass";
+
+        try {
+            // Use Class.forName() to load the class dynamically. [cite: 99]
+            Class<?> cls = Class.forName(className);
+            System.out.println("Class loaded: " + cls.getName());
+
+            // Create an instance of the class
+            Object obj = cls.getDeclaredConstructor().newInstance();
+
+            System.out.println("\n--- Listing Methods ---");
+            // getDeclaredMethods() to get all methods (public, private, protected, package-private)
+            Method[] methods = cls.getDeclaredMethods(); // Use getDeclaredMethods() [cite: 99]
+            for (Method method : methods) {
+                // Print the method names and parameters. [cite: 100]
+                System.out.print("Method Name: " + method.getName() + " (");
+                Parameter[] parameters = method.getParameters();
+                for (int i = 0; i < parameters.length; i++) {
+                    System.out.print(parameters[i].getType().getSimpleName() + " " + parameters[i].getName());
+                    if (i < parameters.length - 1) {
+                        System.out.print(", ");
+                    }
+                }
+                System.out.println(")");
+            }
+
+            System.out.println("\n--- Invoking Methods Dynamically ---");
+
+            // Invoke sayHello() (no parameters)
+            Method sayHelloMethod = cls.getMethod("sayHello");
+            sayHelloMethod.invoke(obj); // invoke() to call a method without directly referencing it in code. [cite: 99]
+
+            // Invoke greet(String name)
+            Method greetMethod = cls.getMethod("greet", String.class);
+            greetMethod.invoke(obj, "Reflection User"); // invoke() [cite: 99]
+
+            // Invoke setData(String newData)
+            Method setDataMethod = cls.getMethod("setData", String.class);
+            setDataMethod.invoke(obj, "New Reflected Data"); // invoke() [cite: 99]
+
+            // Invoke getData()
+            Method getDataMethod = cls.getMethod("getData");
+            String data = (String) getDataMethod.invoke(obj); // invoke() [cite: 99]
+            System.out.println("Retrieved Data: " + data);
+
+            // Accessing and invoking a private method (requires setAccessible(true))
+            Method internalMethod = cls.getDeclaredMethod("internalMethod");
+            internalMethod.setAccessible(true); // Allows access to private methods
+            internalMethod.invoke(obj); // invoke() [cite: 99]
+
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class not found: " + className);
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            System.err.println("Method not found: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            System.err.println("Illegal access to method: " + e.getMessage());
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            System.err.println("Method threw an exception: " + e.getCause().getMessage());
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            System.err.println("Error instantiating class: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+
+//40. Virtual Threads (Java 21)
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
+// VirtualThreadsExample.java
+public class VirtualThreadsExample {
+
+    private static final int NUM_THREADS = 100_000;
+    private static final int MESSAGE_PRINT_LIMIT = 10; // Limit messages to avoid excessive console output
+
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println("Starting Virtual Threads Example...");
+        runVirtualThreads();
+        System.out.println("\nStarting Platform Threads Example (for comparison)...");
+        runPlatformThreads();
+    }
+
+    public static void runVirtualThreads() throws InterruptedException {
+        Instant start = Instant.now();
+        System.out.println("Launching " + NUM_THREADS + " virtual threads...");
+
+        List<Thread> threads = new ArrayList<>();
+        // Use Thread.startVirtualThread(() -> { ... }). [cite: 102]
+        // This implicitly creates a new VirtualThread and starts it.
+        for (int i = 0; i < NUM_THREADS; i++) {
+            final int threadId = i; // Effective final for lambda
+            Thread virtualThread = Thread.ofVirtual().name("virtual-thread-" + threadId).start(() -> {
+                // Print message only for a few threads to avoid overwhelming console
+                if (threadId < MESSAGE_PRINT_LIMIT) {
+                    System.out.println("Hello from Virtual Thread " + threadId);
+                }
+                try {
+                    Thread.sleep(Duration.ofMillis(1)); // Simulate some work
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+            threads.add(virtualThread);
+        }
+
+        // Join all threads to wait for their completion
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        Instant end = Instant.now();
+        System.out.println("Finished launching and joining " + NUM_THREADS + " virtual threads.");
+        // Measure performance versus traditional threads. [cite: 102]
+        System.out.println("Time taken by Virtual Threads: " + Duration.between(start, end).toMillis() + " ms");
+    }
+
+    public static void runPlatformThreads() throws InterruptedException {
+        Instant start = Instant.now();
+        System.out.println("Launching " + NUM_THREADS + " platform threads...");
+
+        // Note: Launching 100,000 platform threads will likely cause an OutOfMemoryError
+        // or be extremely slow, demonstrating why virtual threads are needed.
+        // We will use a thread pool to manage a smaller number of platform threads
+        // to avoid crashing, but the *concept* of managing 100,000 is for virtual threads.
+        // For direct comparison, you would try to launch 100k regular threads if your system could handle it.
+
+        // For practical demonstration, we use a fixed thread pool to manage the tasks
+        // that would conceptually run on platform threads.
+        // Trying to create 100,000 raw Thread instances directly will crash most JVMs.
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); // Pool size based on CPU cores
+
+        // Launch tasks for platform threads
+        for (int i = 0; i < NUM_THREADS; i++) {
+            final int threadId = i;
+            executor.submit(() -> {
+                if (threadId < MESSAGE_PRINT_LIMIT) {
+                    System.out.println("Hello from Platform Task " + threadId);
+                }
+                try {
+                    Thread.sleep(Duration.ofMillis(1)); // Simulate some work
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES); // Wait for all tasks to complete
+
+        Instant end = Instant.now();
+        System.out.println("Finished launching and joining (via pool) " + NUM_THREADS + " platform tasks.");
+        // Measure performance versus traditional threads. [cite: 102]
+        System.out.println("Time taken by Platform Threads (via pool): " + Duration.between(start, end).toMillis() + " ms");
+    }
+}
+
+//41. Executor Service and Callable
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+// MyCallableTask.java (Implements Callable)
+class MyCallableTask implements Callable<String> {
+    private final String taskName;
+    private final int durationMillis;
+
+    public MyCallableTask(String taskName, int durationMillis) {
+        this.taskName = taskName;
+        this.durationMillis = durationMillis;
+    }
+
+    @Override
+    public String call() throws Exception {
+        System.out.println(taskName + " starting...");
+        Thread.sleep(durationMillis); // Simulate work
+        System.out.println(taskName + " finished.");
+        return taskName + " completed successfully in " + durationMillis + "ms!";
+    }
+}
+
+// ExecutorServiceCallableExample.java (Main class)
+public class ExecutorServiceCallableExample {
+    public static void main(String[] args) {
+        // Use Executors.newFixedThreadPool() to create a thread pool. [cite: 104]
+        // This creates a fixed-size thread pool that reuses threads.
+        ExecutorService executor = Executors.newFixedThreadPool(3); // 3 threads in the pool
+
+        List<Future<String>> futures = new ArrayList<>();
+
+        // Submit multiple Callable tasks. [cite: 104]
+        futures.add(executor.submit(new MyCallableTask("Task-1", 2000))); // 2 seconds
+        futures.add(executor.submit(new MyCallableTask("Task-2", 1000))); // 1 second
+        futures.add(executor.submit(new MyCallableTask("Task-3", 3000))); // 3 seconds
+        futures.add(executor.submit(new MyCallableTask("Task-4", 1500))); // 1.5 seconds
+
+        System.out.println("All tasks submitted. Retrieving results...");
+
+        // Collect results using Future.get(). [cite: 104]
+        for (Future<String> future : futures) {
+            try {
+                // future.get() is a blocking call that waits for the task to complete
+                String result = future.get();
+                System.out.println("Result: " + result);
+            } catch (InterruptedException e) {
+                System.err.println("Task was interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt(); // Restore interrupt status
+            } catch (ExecutionException e) {
+                System.err.println("Task threw an exception: " + e.getCause().getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        // Shut down the executor service gracefully
+        executor.shutdown(); // Initiates an orderly shutdown in which previously submitted tasks are executed, but no new tasks will be accepted.
+        try {
+            // Wait for all tasks to complete or timeout
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                System.out.println("Some tasks did not finish in time. Forcibly shutting down.");
+                executor.shutdownNow(); // Attempts to stop all actively executing tasks, halts the processing of waiting tasks, and returns a list of the tasks that were awaiting execution.
+            }
+        } catch (InterruptedException e) {
+            System.err.println("Shutdown interrupted: " + e.getMessage());
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Executor Service shut down.");
+    }
+}
